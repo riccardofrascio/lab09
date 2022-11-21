@@ -21,6 +21,8 @@ public final class AnotherConcurrentGUI extends JFrame {
     private final JButton stop = new JButton("stop");
     private final JButton up = new JButton("up");
     private final JButton down = new JButton("down");
+    final Agent agent = new Agent();
+    final StopAgent stopCount = new StopAgent();
 
     /**
      * Builds a new CGUI.
@@ -42,22 +44,24 @@ public final class AnotherConcurrentGUI extends JFrame {
          * thread management should be left to
          * java.util.concurrent.ExecutorService
          */
-        final Agent agent = new Agent();
         new Thread(agent).start();
-        final StopCounter stopCount = new StopCounter();
         new Thread(stopCount).start();
         /*
          * Register a listener that stops it
          */
         stop.addActionListener(e -> {
-            agent.stopCounting();
-            stopCount.forceStop();
-            up.setEnabled(false);
-            down.setEnabled(false);
+            stopAll();
         });
 
         up.addActionListener((e) -> agent.up=true);
         down.addActionListener((e) -> agent.up=false);
+    }
+
+    private void stopAll() {
+        agent.stopCounting();
+        stopCount.forceStop();
+        up.setEnabled(false);
+        down.setEnabled(false);
     }
 
     /*
@@ -110,7 +114,7 @@ public final class AnotherConcurrentGUI extends JFrame {
         }
     }
 
-    private class StopCounter implements Runnable {
+    private class StopAgent implements Runnable {
         private final int TIME = 10;  //10 sec
         private int counter;
         private volatile boolean stop;
@@ -120,7 +124,7 @@ public final class AnotherConcurrentGUI extends JFrame {
             while(!this.stop) {
                 try {
                     if(this.counter==TIME) {
-                        AnotherConcurrentGUI.this.stop.doClick();
+                        stopAll();
                     }
                     this.counter++;
                     Thread.sleep(1000);
