@@ -53,8 +53,8 @@ public final class ConcurrentGUI extends JFrame {
             down.setEnabled(false);
         });
 
-        up.addActionListener((e) -> agent.up=true);
-        down.addActionListener((e) -> agent.up=false);
+        up.addActionListener((e) -> agent.upCount=true);
+        down.addActionListener((e) -> agent.upCount=false);
     }
 
     /*
@@ -73,7 +73,7 @@ public final class ConcurrentGUI extends JFrame {
          * 
          */
         private volatile boolean stop;
-        private volatile boolean up = true;
+        private volatile boolean upCount = true;
         private int counter;
 
         @Override
@@ -81,7 +81,7 @@ public final class ConcurrentGUI extends JFrame {
             while (!this.stop) {
                 try {
                     // The EDT doesn't access `counter` anymore, it doesn't need to be volatile 
-                    if(this.up){
+                    if(this.upCount){
                         this.counter++;
                     } else {
                         this.counter--;
